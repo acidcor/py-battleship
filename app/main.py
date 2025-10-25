@@ -74,6 +74,7 @@ class Battleship:
     ) -> None:
         self.field:\
             Dict[Tuple[Tuple[int, int], ...], Ship] = self._add_ship(ships)
+        self._validate_field()
 
     @staticmethod
     def _add_ship(
@@ -90,3 +91,69 @@ class Battleship:
             if location in ship_decks:
                 return ship.fire(*location)
         return "Miss!"
+
+    def print_field(self) -> None:
+        field = []
+
+        for x_axis in range(10):
+            row = []
+            for y_axis in range(10):
+                cell = "~"
+                for ship_decks in self.field:
+                    if (y_axis, x_axis) in ship_decks:
+                        ship = self.field[ship_decks]
+                        deck = ship.get_deck(y_axis, x_axis)
+
+                        if ship.is_drowned:
+                            cell = "x"
+                        elif deck.is_alive:
+                            cell = "□"
+                        else:
+                            cell = "*"
+                row.append(cell)
+            field.append(row)
+
+        for row in field:
+            print(" ".join(row))
+
+    def _validate_field(self) -> None:
+        self._validate_ships_amount()
+        self._validate_ships_pos()
+
+    def _validate_ships_amount(self) -> None:
+        tests = {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0
+        }
+
+        for ship_decks in self.field:
+            tests[len(ship_decks)] += 1
+
+        assert tests[1] == 4
+        assert tests[2] == 3
+        assert tests[3] == 2
+        assert tests[4] == 1
+        assert sum(tests.values()) == 10
+
+    @staticmethod
+    def is_neighbor(
+            self_deck: tuple[int, int],
+            neighbor_dack: tuple[int, int]
+    ) -> bool:
+        self_x, self_y = self_deck
+        neighbor_x, neighbor_y = neighbor_dack
+
+        dx = abs(self_x - neighbor_x)
+        dy = abs(self_y - neighbor_y)
+        return max(dx, dy) == 1
+
+    def _validate_ships_pos(self) -> None:
+        for decks in self.field:
+            for neighbors_decks in self.field:
+                if decks == neighbors_decks:
+                    continue
+                for deck in decks:
+                    for neighbor in neighbors_decks:
+                        assert not self.is_neighbor(deck, neighbor)
