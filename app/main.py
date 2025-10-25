@@ -95,14 +95,14 @@ class Battleship:
     def print_field(self) -> None:
         field = []
 
-        for x_axis in range(10):
+        for rows in range(10):
             row = []
-            for y_axis in range(10):
+            for columns in range(10):
                 cell = "~"
                 for ship_decks in self.field:
-                    if (y_axis, x_axis) in ship_decks:
+                    if (rows, columns) in ship_decks:
                         ship = self.field[ship_decks]
-                        deck = ship.get_deck(y_axis, x_axis)
+                        deck = ship.get_deck(rows, columns)
 
                         if ship.is_drowned:
                             cell = "x"
@@ -110,6 +110,7 @@ class Battleship:
                             cell = "□"
                         else:
                             cell = "*"
+
                 row.append(cell)
             field.append(row)
 
